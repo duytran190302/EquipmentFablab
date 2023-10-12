@@ -57,7 +57,6 @@ namespace Fablab.Services
 			else
 			{
 				await _mqttClient.SubscribeAsync("qaz/123456");
-				// await _mqttClient.SubscribeAsync("VTSauto/AR_project/IOT_pub/+");
 				await _mqttClient.SubscribeAsync("micro850/Project/ab");
 				await _mqttClient.SubscribeAsync("VTSauto/AR_project/Kep_pub");
 

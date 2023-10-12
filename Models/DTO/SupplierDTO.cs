@@ -9,6 +9,5 @@ namespace Fablab.Models.DTO
 		public string PhoneNumber { get; set; }
 		//
 		public ICollection<Equipment> Equipments { get; set; }
-		public ICollection<SupplierAddress> supplierAddresses { get; set; }
 	}
 }

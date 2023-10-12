@@ -1,19 +1,21 @@
-﻿namespace Fablab.Models.Domain
+﻿using Microsoft.AspNetCore.Components.Routing;
+using System.ComponentModel.DataAnnotations;
+
+namespace Fablab.Models.Domain
 {
 	public class Equipment
 	{
-		public Guid Id { get; set; }
-		public string Name { get; set; }
-		public string Picture { get; set; }
-		public DateTime YearSupply { get; set; }
-		public string CodeOfManage { get; set; }
+		public Guid EquipmentId { get; set; }
+		public string EquipmentName { get; set; }
+		public DateTime YearOfSupply { get; set; }
+		public string CodeOfManager { get; set; }
 		//
+		public Location Location { get; set; }
 		public Supplier Supplier { get; set; }
-		public EquipmentSpecifications Specification { get; set; }
-		public Borrow Borrow { get; set; }
-		public BorrowFromOutside BorrowFromOutside { get; set; }
 		public EquipmentStatus Status { get; set; }
 		public EquipmentType EquipmentType { get; set; }
+
+		public List<Borrow> Borrows { get; set; }
 
 
 	}

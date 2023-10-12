@@ -9,7 +9,7 @@ namespace Fablab.Models.DTO
 		public string Borrower { get; set; }
 		public string Reason { get; set; }
 		//
-		public ResearchTopic ResearchTopic { get; set; }
+		public Project ResearchTopic { get; set; }
 		public ICollection<Equipment> Equipment { get; set; }
 	}
 }

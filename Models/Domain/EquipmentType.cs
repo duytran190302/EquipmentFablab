@@ -1,9 +1,12 @@
 ﻿namespace Fablab.Models.Domain
 {
-	public enum EquipmentType
+	public class EquipmentType
 	{
-		mechanical,
-		IoT_robotics,
-		automation
+		public string Id { get; set; }
+		public string Picture { get; set; }
+		public string Value { get; set; }
+		//
+		public Category Category { get; set; }
+
 	}
 }
