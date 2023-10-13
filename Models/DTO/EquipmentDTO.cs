@@ -1,4 +1,5 @@
 ﻿using Fablab.Models.Domain;
+using System.ComponentModel.DataAnnotations;
 
 namespace Fablab.Models.DTO
 {
@@ -10,6 +11,7 @@ namespace Fablab.Models.DTO
 		//
 		public Supplier Supplier { get; set; }
 		public Location Location { get; set; }
+		[EnumDataType(typeof(EquipmentStatus))]
 		public EquipmentStatus Status { get; set; }
 		public EquipmentType EquipmentType { get; set; }
 	}

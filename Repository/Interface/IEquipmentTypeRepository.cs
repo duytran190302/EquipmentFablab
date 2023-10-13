@@ -1,6 +1,9 @@
-﻿namespace Fablab.Repository.Interface
+﻿using Fablab.Models.Domain;
+
+namespace Fablab.Repository.Interface
 {
-	public interface IEquipmentTypeRepositoroy
+	public interface IEquipmentTypeRepository: IRepository<EquipmentType>
 	{
+		Task<EquipmentType> UpdateAsync(EquipmentType entity);
 	}
 }

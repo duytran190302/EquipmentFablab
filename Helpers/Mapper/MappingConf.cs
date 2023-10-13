@@ -14,6 +14,7 @@ namespace Fablab.Helpers.Mapper
 			CreateMap<EquipmentType, EquipmentTypeDTO>().ReverseMap();
 			CreateMap<Location,LocationDTO>().ReverseMap();
 			CreateMap<Project, ProjectDTO>().ReverseMap();
+			CreateMap<Project, AddProjectDTO>().ReverseMap();
 			CreateMap<Supplier, SupplierDTO>().ReverseMap();
 			
 

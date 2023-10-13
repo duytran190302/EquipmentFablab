@@ -12,6 +12,7 @@ namespace Fablab.Models.Domain
 		//
 		public Location Location { get; set; }
 		public Supplier Supplier { get; set; }
+		[EnumDataType(typeof(EquipmentStatus))]
 		public EquipmentStatus Status { get; set; }
 		public EquipmentType EquipmentType { get; set; }
 

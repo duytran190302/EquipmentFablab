@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fablab.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231011054840_DbInit")]
+    [Migration("20231012083435_DbInit")]
     partial class DbInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

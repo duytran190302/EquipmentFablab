@@ -48,6 +48,7 @@ namespace Fablab.Repository.Implementation
 			{
 				query = query.Where(filter);
 			}
+
 			if (pageSize > 0)
 			{
 				if (pageSize > 100)

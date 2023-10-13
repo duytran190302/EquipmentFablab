@@ -1,6 +1,9 @@
-﻿namespace Fablab.Repository.Interface
+﻿using Fablab.Models.Domain;
+
+namespace Fablab.Repository.Interface
 {
-	public interface ISupplier
+	public interface ISupplierRepository: IRepository<Supplier>
 	{
+		Task<Supplier> UpdateAsync(Supplier entity);
 	}
 }
