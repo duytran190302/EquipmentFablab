@@ -5,7 +5,7 @@ namespace Fablab.Models.Domain
 {
 	public class Borrow
 	{
-		public Guid BorrowID { get; set; }
+		public string BorrowId { get; set; }
 		public DateTime BorrowedDate { get; set; }
 
 		public DateTime ReturnedDate { get; set; }
@@ -15,6 +15,6 @@ namespace Fablab.Models.Domain
 		public bool OnSide { get; set; }
 
 		public Project Project { get; set; }
-		public List<Equipment> Equipments { get; set; }
+		public ICollection<EquipmentBorrow> equipmentBorrows { get; set; }
 	}
 }

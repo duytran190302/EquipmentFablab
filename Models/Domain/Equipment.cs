@@ -5,7 +5,7 @@ namespace Fablab.Models.Domain
 {
 	public class Equipment
 	{
-		public Guid EquipmentId { get; set; }
+		public string EquipmentId { get; set; }
 		public string EquipmentName { get; set; }
 		public DateTime YearOfSupply { get; set; }
 		public string CodeOfManager { get; set; }
@@ -16,7 +16,7 @@ namespace Fablab.Models.Domain
 		public EquipmentStatus Status { get; set; }
 		public EquipmentType EquipmentType { get; set; }
 
-		public List<Borrow> Borrows { get; set; }
+		public ICollection<EquipmentBorrow> equipmentBorrows { get; set; }
 
 
 	}

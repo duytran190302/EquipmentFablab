@@ -18,29 +18,30 @@ namespace Fablab.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			// Xác định các thuộc tính làm khóa phức
+			// Xác định các thuộc tính làm key
 			modelBuilder.Entity<Supplier>().HasKey(p => p.SupplierName);
-			modelBuilder.Entity<EquipmentType>().HasKey(e => e.Id);
-			modelBuilder.Entity<Location>().HasKey(e=> e.LocationID);
+			modelBuilder.Entity<EquipmentType>().HasKey(e => e.EquipmentTypeId);
+			modelBuilder.Entity<Location>().HasKey(p=>p.LocationId);
 			modelBuilder.Entity<Project>().HasKey(p => p.ProjectName);
 
 
 			modelBuilder.Entity<Equipment>().HasKey(e => e.EquipmentId);
-			modelBuilder.Entity<Borrow>().HasKey(p => p.BorrowID);
+			modelBuilder.Entity<Borrow>().HasKey(p => p.BorrowId);
 
-			modelBuilder.Entity<Borrow>()
-			.HasMany(s => s.Equipments)
-			.WithMany(c => c.Borrows)
-			.UsingEntity<EquipmentBorrow>(
-				j => j
-					.HasOne(e => e.Equipment)
-					.WithMany()
-					.HasForeignKey(e => e.EquipmentId),
-				j => j
-					.HasOne(e => e.Borrow)
-					.WithMany()
-					.HasForeignKey(e => e.BorrowID)
-			);
+
+			modelBuilder.Entity<EquipmentBorrow>()
+				.HasKey(p=> new {p.EquipmentId,p.BorrowId});
+			modelBuilder.Entity<EquipmentBorrow>()
+				.HasOne(p => p.Borrow)
+				.WithMany(p=>p.equipmentBorrows)
+				.HasForeignKey(p=>p.BorrowId);
+			modelBuilder.Entity<EquipmentBorrow>()
+				.HasOne(p => p.Equipment)
+				.WithMany(p => p.equipmentBorrows)
+				.HasForeignKey(p => p.EquipmentId);
+
+
+
 
 
 		}

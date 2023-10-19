@@ -2,9 +2,11 @@
 using Fablab.Data;
 using Fablab.Models.Domain;
 using Fablab.Models.DTO;
+using Fablab.Repository.Implementation;
 using Fablab.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Fablab.Controllers
 {
@@ -13,154 +15,130 @@ namespace Fablab.Controllers
 	public class EquipmentController : ControllerBase
 	{
 		private readonly DataContext _dataContext;
+
+		private readonly ILocationRepository _locationRepository;
+		private readonly IEquipmentTypeRepository _equipmentTypeRepository;
+		private readonly ISupplierRepository _supplierRepository;
 		private readonly IEquipmentRepository _equipmentRepository;
 		private readonly IMapper _mapper;
-		public EquipmentController(IEquipmentRepository equipmentRepository, IMapper mapper, DataContext dataContext)
+		public EquipmentController(IEquipmentRepository equipmentRepository, IMapper mapper,
+			ILocationRepository locationRepository,
+			IEquipmentTypeRepository equipmentTypeRepository,
+			ISupplierRepository supplierRepository, DataContext dataContext)
 		{
 			_equipmentRepository = equipmentRepository;
 			_mapper = mapper;
+		
+			_locationRepository = locationRepository;
+			_equipmentTypeRepository = equipmentTypeRepository;
+			_supplierRepository = supplierRepository;
 			_dataContext = dataContext;
+
 		}
 
-		[HttpGet("Equipments")]
+		[HttpGet]
 		public async Task<IActionResult> GetEquipments([FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
 		{
 			try
 			{
-				IEnumerable<Equipment> EquipList;
-				EquipList = await _equipmentRepository.GetAllAsync(pageSize: pageSize,
+				IEnumerable<Equipment> equipmentList;
+				equipmentList= await _equipmentRepository.GetAllEquipmentAsync(pageSize: pageSize,
 							pageNumber: pageNumber);
+
 				if (!string.IsNullOrEmpty(search))
 				{
-					EquipList = EquipList.Where(e => e.EquipmentName.Contains(search));
-					var EquipListDTO = _mapper.Map<List<EquipmentDTO>>(EquipList);
-					return Ok(EquipListDTO);
+					equipmentList = equipmentList.Where(e => e.EquipmentName.Contains(search));
+					var equipmentListDTO = _mapper.Map<List<EquipmentDTO>>(equipmentList);
+					return Ok(equipmentListDTO);
 				}
 				else
 				{
-					var EquipListDTO = _mapper.Map<List<EquipmentDTO>>(EquipList);
-					return Ok(EquipListDTO);
-				}
-			}
-				catch
-			{
-				return BadRequest();
-			}
-
-		}
-
-		[HttpGet("AllEquipment")]
-		public async Task<IActionResult> GetAllEquipments([FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
-		{
-			try
-			{
-				IEnumerable<Equipment> EquipList;
-				EquipList = await _equipmentRepository.GetAllEquipmentAsync(pageSize: pageSize,
-							pageNumber: pageNumber);
-				if (!string.IsNullOrEmpty(search))
-				{
-					EquipList = EquipList.Where(e => e.EquipmentName.Contains(search));
-					var EquipListDTO = _mapper.Map<List<EquipmentDTO>>(EquipList);
-					return Ok(EquipListDTO);
-				}
-				else
-				{
-					var EquipListDTO = _mapper.Map<List<EquipmentDTO>>(EquipList);
-					return Ok(EquipListDTO);
+					var equipmentListDTO = _mapper.Map<List<EquipmentDTO>>(equipmentList);
+					return Ok(equipmentListDTO);
 				}
 			}
 			catch
 			{
-				return BadRequest();
+				return NotFound();
 			}
 
 		}
+		[HttpGet("Search")]
+		public async Task<IActionResult> SearchEquipments(
+			[FromQuery] string? equipmentId,
+			[FromQuery] string? equipmentName,
+			[FromQuery] DateTime? YearOfSupply,
+			[FromQuery] string? CodeOfManager,
 
-		[HttpGet("Equipment")]
-		public async Task<IActionResult> GetEquipment(string name)
+			[FromQuery] string? equipmentTypeId,
+			[FromQuery] string? equipmentTypeName,
+			[FromQuery] Category? Category,
+			
+
+			[FromQuery] string? equipmentStatus,
+
+
+			int pageSize = 0, int pageNumber = 1)
 		{
-			if (string.IsNullOrEmpty(name))
+			try
 			{
-				return BadRequest();
+				IEnumerable<Equipment> equipmentList;
+				equipmentList = await _equipmentRepository.SearchEquipmentAsync();
+
+				if (!string.IsNullOrEmpty(equipmentId))
+				{equipmentList = equipmentList.Where(e => e.EquipmentId==equipmentId);}
+				if (!string.IsNullOrEmpty(equipmentName))
+				{ equipmentList = equipmentList.Where(e=>e.EquipmentName==equipmentName); }
+				if (YearOfSupply != null)
+				{ equipmentList = equipmentList.Where(e => e.YearOfSupply== YearOfSupply); }
+				if (!string.IsNullOrEmpty(CodeOfManager))
+				{ equipmentList = equipmentList.Where(e => e.CodeOfManager == CodeOfManager); }
+				if (!string.IsNullOrEmpty(equipmentTypeId))
+				{ equipmentList = equipmentList.Where(e=>e.EquipmentType.EquipmentTypeId==equipmentTypeId); }
+				if (!string.IsNullOrEmpty(equipmentTypeName))
+				{ equipmentList = equipmentList.Where(e=>e.EquipmentType.EquipmentTypeName==equipmentTypeName); }
+				if (Category != null)
+				{ equipmentList = equipmentList.Where(e => e.EquipmentType.Category == Category); }
+
+
+				equipmentList =equipmentList.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList();
+				var equipmentListDTO = _mapper.Map<List<EquipmentDTO>>(equipmentList);
+				return Ok(equipmentListDTO);
+
 			}
-			var Equip = await _equipmentRepository.GetAsync(e => e.EquipmentName == name);
-			var EquipDTO = _mapper.Map<EquipmentDTO>(Equip);
-			if (EquipDTO == null)
+			catch
 			{
 				return NotFound();
 			}
-			return Ok(EquipDTO);
+
 		}
 
-		[HttpGet("EquipmentByName")]
-		public async Task<IActionResult> GetEquipmentByName(string name)
-		{
-			if (string.IsNullOrEmpty(name))
-			{
-				return BadRequest();
-			}
-
-
-			var Equip = await _equipmentRepository.GetEquipmentByNameAsync(name);
-			var EquipDTO = _mapper.Map<List<EquipmentDTO>>(Equip);
-			if (EquipDTO == null)
-			{
-				return NotFound();
-			}
-			return Ok(EquipDTO);
-		}
 
 
 		[HttpPost]
-		public async Task<IActionResult> AddEquipment([FromBody] EquipmentDTO equipmentDTO)
+		public async Task<IActionResult> PostEquipment([FromBody] PostEquipmentDTO postEquipmentDTO)
 		{
-			if (await _equipmentRepository.GetAsync(e => e.EquipmentName.ToLower() == equipmentDTO.EquipmentName.ToLower()) != null)
-			{
-				return BadRequest("trung ten thiet bi");
-			}
-			if (equipmentDTO == null)
-			{
-				return BadRequest(equipmentDTO);
-			}
-
-			// thêm xong update cái giá trị  S E L
-			var ES = equipmentDTO.Supplier;
-			var ET = equipmentDTO.EquipmentType;
-			var EL = equipmentDTO.Location;
-			if (_dataContext.Suppliers.Any(s => s.SupplierName == equipmentDTO.Supplier.SupplierName))
-			{
-				equipmentDTO.Supplier = null;
-			}
-			if (_dataContext.Location.Any(s => s.LocationID == equipmentDTO.Location.LocationID))
-			{
-				equipmentDTO.Location = null;
-			}
-			if (_dataContext.EquipmentTypes.Any(s => s.Id == equipmentDTO.EquipmentType.Id))
-			{
-				equipmentDTO.EquipmentType = null;
-			}
-
-
-			Equipment equipment = _mapper.Map<Equipment>(equipmentDTO);
-			equipment.EquipmentId = Guid.NewGuid();
-			await _equipmentRepository.CreateAsync(equipment);
-
-
 			try
 			{
-				equipment.Supplier = _dataContext.Suppliers.FirstOrDefault(s=> s.SupplierName==ES.SupplierName);
-				equipment.EquipmentType = _dataContext.EquipmentTypes.FirstOrDefault(s => s.Id == ET.Id);
-				equipment.Location = _dataContext.Location.FirstOrDefault(s => s.LocationID == EL.LocationID);
-				await _equipmentRepository.UpdateAsync(equipment);
+				if (postEquipmentDTO == null)
+				{
+					return BadRequest();
+				}
+				if (await _equipmentRepository.GetAsync(e => e.EquipmentId.ToLower() == postEquipmentDTO.EquipmentId.ToLower()) != null)
+				{
+					return BadRequest("trung id equipment");
+				}
+
+
+				var equipment =await _equipmentRepository.PostEquipmentAsync(postEquipmentDTO);
+
 				return Ok(equipment);
 			}
-			catch
-			{
-				return BadRequest();
-			}
-
-			
+			catch (Exception ex)
+			{ return BadRequest(ex); }
 		}
+
+
 
 		[HttpDelete]
 		public async Task<IActionResult> DeleteEquipment([FromQuery] string name)
@@ -169,7 +147,7 @@ namespace Fablab.Controllers
 			{
 				return BadRequest();
 			}
-			var equipment = await _equipmentRepository.GetAsync(e => e.EquipmentName == name);
+			var equipment = await _equipmentRepository.GetAsync(e => e.EquipmentId == name);
 			if (equipment == null)
 			{
 				return NotFound();
@@ -178,20 +156,34 @@ namespace Fablab.Controllers
 			return Ok(equipment);
 		}
 
-
 		[HttpPut]
-		public async Task<IActionResult> UpdateEquipment(string name,[FromBody] UpdateEquip equipmentDTO )
+		public async Task<ActionResult> PutEquipment([FromBody] PutEquipmentDTO equipmentDTO)
 		{
-			if(equipmentDTO == null || name != equipmentDTO.EquipmentName)
+			try
 			{
-				return BadRequest();
+				if (equipmentDTO == null)
+				{
+					return BadRequest();
+				}
+				var equipment = await _equipmentRepository.GetAsync(e => e.EquipmentId == equipmentDTO.EquipmentId);
+				if (equipment == null)
+				{
+					return NotFound();
+				}
+
+				Equipment equipment1 = _mapper.Map<Equipment>(equipmentDTO);
+
+				await _equipmentRepository.UpdateAsync(equipment1);
+
+				return Ok(equipment1);
 			}
-			var equip = _dataContext.Equipment.FirstOrDefault(x=>x.EquipmentName== name);
-			equip.YearOfSupply = equipmentDTO.YearOfSupply;
-			equip.CodeOfManager = equipmentDTO.CodeOfManager;
-			equip.Status= equipmentDTO.Status;
-			await _equipmentRepository.UpdateAsync(equip);
-			return Ok(equip);
+			catch (Exception ex)
+			{
+				return BadRequest(ex);
+			}
+
+
+
 		}
 
 	}

@@ -24,9 +24,8 @@ namespace Fablab.Migrations
 
             modelBuilder.Entity("Fablab.Models.Domain.Borrow", b =>
                 {
-                    b.Property<Guid>("BorrowID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("BorrowId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("BorrowedDate")
                         .HasColumnType("datetime2");
@@ -46,7 +45,7 @@ namespace Fablab.Migrations
                     b.Property<DateTime>("ReturnedDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("BorrowID");
+                    b.HasKey("BorrowId");
 
                     b.HasIndex("ProjectName");
 
@@ -55,9 +54,8 @@ namespace Fablab.Migrations
 
             modelBuilder.Entity("Fablab.Models.Domain.Equipment", b =>
                 {
-                    b.Property<Guid>("EquipmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("EquipmentId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CodeOfManager")
                         .HasColumnType("nvarchar(max)");
@@ -68,7 +66,7 @@ namespace Fablab.Migrations
                     b.Property<string>("EquipmentTypeId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("LocationID")
+                    b.Property<string>("LocationId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
@@ -84,7 +82,7 @@ namespace Fablab.Migrations
 
                     b.HasIndex("EquipmentTypeId");
 
-                    b.HasIndex("LocationID");
+                    b.HasIndex("LocationId");
 
                     b.HasIndex("SupplierName");
 
@@ -93,47 +91,47 @@ namespace Fablab.Migrations
 
             modelBuilder.Entity("Fablab.Models.Domain.EquipmentBorrow", b =>
                 {
-                    b.Property<Guid>("BorrowID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("EquipmentId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("EquipmentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("BorrowId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("BorrowID", "EquipmentId");
+                    b.HasKey("EquipmentId", "BorrowId");
 
-                    b.HasIndex("EquipmentId");
+                    b.HasIndex("BorrowId");
 
                     b.ToTable("EquipmentBorrows");
                 });
 
             modelBuilder.Entity("Fablab.Models.Domain.EquipmentType", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("EquipmentTypeId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
+                    b.Property<string>("EquipmentTypeName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
+                    b.HasKey("EquipmentTypeId");
 
                     b.ToTable("EquipmentTypes");
                 });
 
             modelBuilder.Entity("Fablab.Models.Domain.Location", b =>
                 {
-                    b.Property<string>("LocationID")
+                    b.Property<string>("LocationId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("LocationID");
+                    b.HasKey("LocationId");
 
                     b.ToTable("Location");
                 });
@@ -193,7 +191,7 @@ namespace Fablab.Migrations
 
                     b.HasOne("Fablab.Models.Domain.Location", "Location")
                         .WithMany()
-                        .HasForeignKey("LocationID");
+                        .HasForeignKey("LocationId");
 
                     b.HasOne("Fablab.Models.Domain.Supplier", "Supplier")
                         .WithMany()
@@ -209,13 +207,13 @@ namespace Fablab.Migrations
             modelBuilder.Entity("Fablab.Models.Domain.EquipmentBorrow", b =>
                 {
                     b.HasOne("Fablab.Models.Domain.Borrow", "Borrow")
-                        .WithMany()
-                        .HasForeignKey("BorrowID")
+                        .WithMany("equipmentBorrows")
+                        .HasForeignKey("BorrowId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Fablab.Models.Domain.Equipment", "Equipment")
-                        .WithMany()
+                        .WithMany("equipmentBorrows")
                         .HasForeignKey("EquipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -223,6 +221,16 @@ namespace Fablab.Migrations
                     b.Navigation("Borrow");
 
                     b.Navigation("Equipment");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.Borrow", b =>
+                {
+                    b.Navigation("equipmentBorrows");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.Equipment", b =>
+                {
+                    b.Navigation("equipmentBorrows");
                 });
 
             modelBuilder.Entity("Fablab.Models.Domain.Project", b =>

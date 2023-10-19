@@ -13,26 +13,26 @@ namespace Fablab.Migrations
                 name: "EquipmentTypes",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EquipmentTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Picture = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EquipmentTypeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Category = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EquipmentTypes", x => x.Id);
+                    table.PrimaryKey("PK_EquipmentTypes", x => x.EquipmentTypeId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Location",
                 columns: table => new
                 {
-                    LocationID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LocationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Location", x => x.LocationID);
+                    table.PrimaryKey("PK_Location", x => x.LocationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -67,7 +67,7 @@ namespace Fablab.Migrations
                 name: "Borrow",
                 columns: table => new
                 {
-                    BorrowID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BorrowId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     BorrowedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ReturnedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Borrower = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -77,7 +77,7 @@ namespace Fablab.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Borrow", x => x.BorrowID);
+                    table.PrimaryKey("PK_Borrow", x => x.BorrowId);
                     table.ForeignKey(
                         name: "FK_Borrow_Project_ProjectName",
                         column: x => x.ProjectName,
@@ -89,11 +89,11 @@ namespace Fablab.Migrations
                 name: "Equipment",
                 columns: table => new
                 {
-                    EquipmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EquipmentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     EquipmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     YearOfSupply = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CodeOfManager = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LocationID = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    LocationId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     SupplierName = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     EquipmentTypeId = table.Column<string>(type: "nvarchar(450)", nullable: true)
@@ -105,12 +105,12 @@ namespace Fablab.Migrations
                         name: "FK_Equipment_EquipmentTypes_EquipmentTypeId",
                         column: x => x.EquipmentTypeId,
                         principalTable: "EquipmentTypes",
-                        principalColumn: "Id");
+                        principalColumn: "EquipmentTypeId");
                     table.ForeignKey(
-                        name: "FK_Equipment_Location_LocationID",
-                        column: x => x.LocationID,
+                        name: "FK_Equipment_Location_LocationId",
+                        column: x => x.LocationId,
                         principalTable: "Location",
-                        principalColumn: "LocationID");
+                        principalColumn: "LocationId");
                     table.ForeignKey(
                         name: "FK_Equipment_Suppliers_SupplierName",
                         column: x => x.SupplierName,
@@ -122,17 +122,17 @@ namespace Fablab.Migrations
                 name: "EquipmentBorrows",
                 columns: table => new
                 {
-                    BorrowID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EquipmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    BorrowId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EquipmentId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EquipmentBorrows", x => new { x.BorrowID, x.EquipmentId });
+                    table.PrimaryKey("PK_EquipmentBorrows", x => new { x.EquipmentId, x.BorrowId });
                     table.ForeignKey(
-                        name: "FK_EquipmentBorrows_Borrow_BorrowID",
-                        column: x => x.BorrowID,
+                        name: "FK_EquipmentBorrows_Borrow_BorrowId",
+                        column: x => x.BorrowId,
                         principalTable: "Borrow",
-                        principalColumn: "BorrowID",
+                        principalColumn: "BorrowId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EquipmentBorrows_Equipment_EquipmentId",
@@ -153,9 +153,9 @@ namespace Fablab.Migrations
                 column: "EquipmentTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Equipment_LocationID",
+                name: "IX_Equipment_LocationId",
                 table: "Equipment",
-                column: "LocationID");
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Equipment_SupplierName",
@@ -163,9 +163,9 @@ namespace Fablab.Migrations
                 column: "SupplierName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EquipmentBorrows_EquipmentId",
+                name: "IX_EquipmentBorrows_BorrowId",
                 table: "EquipmentBorrows",
-                column: "EquipmentId");
+                column: "BorrowId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

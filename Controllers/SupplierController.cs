@@ -5,6 +5,8 @@ using Fablab.Repository.Implementation;
 using Fablab.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Xml.Linq;
 
 namespace Fablab.Controllers
 {
@@ -21,8 +23,8 @@ namespace Fablab.Controllers
 			_mapper = mapper;
 		}
 
-		[HttpGet("Locations")]
-		public async Task<IActionResult> GetLocations([FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
+		[HttpGet]
+		public async Task<IActionResult> GetSuppliers([FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
 		{
 			try
 			{
@@ -32,7 +34,7 @@ namespace Fablab.Controllers
 				if (!string.IsNullOrEmpty(search))
 				{
 					SupplierList = SupplierList.Where(e => e.SupplierName.Contains(search));
-					var SupplierListDTO = _mapper.Map<List<Supplier>>(SupplierList);
+					var SupplierListDTO = _mapper.Map<List<SupplierDTO>>(SupplierList);
 					return Ok(SupplierListDTO);
 				}
 				else
@@ -49,7 +51,7 @@ namespace Fablab.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> AddLocation([FromBody] SupplierDTO supplierDTO)
+		public async Task<IActionResult> PostSupplier ([FromBody] SupplierDTO supplierDTO)
 		{
 			try
 			{
@@ -57,13 +59,13 @@ namespace Fablab.Controllers
 				{
 					return BadRequest();
 				}
-				if (await _supplierRepository.GetAsync(e => e.SupplierName.ToLower() == supplierDTO.SupplierName.ToLower()) != null)
+				if (await _supplierRepository.GetAsync (e => e.SupplierName.ToLower() == supplierDTO.SupplierName.ToLower()) != null)
 				{
-					return BadRequest("trung ten location");
+					return BadRequest("trung ten supplier");
 				}
 
 				Supplier supplier = _mapper.Map<Supplier>(supplierDTO);
-				await _supplierRepository.UpdateAsync(supplier);
+				await _supplierRepository.CreateAsync(supplier);
 				return Ok(supplier);
 			}
 			catch
@@ -88,6 +90,32 @@ namespace Fablab.Controllers
 			return Ok(supplier);
 		}
 
+		[HttpPut]
+		public async Task<ActionResult> PutSupplier ( [FromBody] SupplierDTO supplierDTO)
+		{
+			try
+			{
+				if (supplierDTO == null)
+				{
+					return BadRequest();
+				}
+				var supplier = await _supplierRepository.GetAsync(e => e.SupplierName == supplierDTO.SupplierName);
+				if (supplier == null)
+				{
+					return NotFound();
+				}
 
+				Supplier supplier1 = _mapper.Map<Supplier>(supplierDTO);
+
+				await _supplierRepository.UpdateAsync(supplier1);
+
+				return Ok(supplier1);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex);
+			}
+
+		}
 	}
 }

@@ -86,3 +86,10 @@ C:\Users\ACER\source\repos\Fablab\obj\Debug\net6.0\refint\Fablab.dll
 C:\Users\ACER\source\repos\Fablab\obj\Debug\net6.0\Fablab.pdb
 C:\Users\ACER\source\repos\Fablab\obj\Debug\net6.0\Fablab.genruntimeconfig.cache
 C:\Users\ACER\source\repos\Fablab\obj\Debug\net6.0\ref\Fablab.dll
+C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\GraphQL.dll
+C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\GraphQLParser.dll
+C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Microsoft.AspNetCore.Razor.Language.dll
+C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll

@@ -10,13 +10,22 @@ namespace Fablab.Helpers.Mapper
 		public MappingConf() 
 		{
 			CreateMap<Borrow, BorrowDTO>().ReverseMap();
-			CreateMap<Equipment, EquipmentDTO>().ReverseMap();
-			CreateMap<EquipmentType, EquipmentTypeDTO>().ReverseMap();
-			CreateMap<Location,LocationDTO>().ReverseMap();
+
+
+
 			CreateMap<Project, ProjectDTO>().ReverseMap();
-			CreateMap<Project, AddProjectDTO>().ReverseMap();
+			CreateMap<Project, PostProjectDTO>().ReverseMap();
+			CreateMap<Project, ApproveProject>().ReverseMap();
+
+
 			CreateMap<Supplier, SupplierDTO>().ReverseMap();
-			
+			CreateMap<Location, LocationDTO>().ReverseMap();
+			CreateMap<EquipmentType, EquipmentTypeDTO>().ReverseMap();
+			CreateMap<Equipment, EquipmentDTO>().ReverseMap();
+			CreateMap<Equipment, PostEquipmentDTO>().ReverseMap();
+			CreateMap<Equipment, PutEquipmentDTO>().ReverseMap();
+
+
 
 		}
 

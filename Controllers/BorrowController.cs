@@ -39,7 +39,6 @@ namespace Fablab.Controllers
 			{
 				Borrow borrow = _mapper.Map<Borrow>(borrowDTO);
 				borrow.Project= _dataContext.Project.FirstOrDefault(x=> x.ProjectName==borrowDTO.BorrowProject);
-				borrow.BorrowID = Guid.NewGuid();
 
 
 				List<Equipment> equip = new List<Equipment>();
@@ -52,7 +51,7 @@ namespace Fablab.Controllers
 						equip.Add(eq);
 					}
 				}
-				borrow.Equipments = equip;
+				//borrow.equipmentBorrows. = equip;
 				await _borrowRepository.CreateAsync(borrow);
 				await _borrowRepository.UpdateAsync(borrow);
 				return Ok(borrow);

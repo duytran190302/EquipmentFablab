@@ -30,8 +30,8 @@ namespace Fablab.Controllers
 							pageNumber: pageNumber);
 				if (!string.IsNullOrEmpty(search))
 				{
-					LocationList = LocationList.Where(e => e.LocationID.Contains(search));
-					var LocationListDTO = _mapper.Map<List<LocationDTO>>(LocationList);
+					LocationList = LocationList.Where(e => e.LocationId.Contains(search));
+					var LocationListDTO = _mapper.Map<List<Location>>(LocationList);
 					return Ok(LocationListDTO);
 				}
 				else
@@ -48,26 +48,29 @@ namespace Fablab.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> AddLocation([FromBody] LocationDTO locationDTO)
+		public async Task<IActionResult> PostLocation([FromBody] LocationDTO locationDTO)
 		{
 			try
 			{
 				if (locationDTO == null)
 				{
-					return BadRequest();
+					return BadRequest("null");
 				}
-				if (await _locationRepository.GetAsync(e => e.LocationID.ToLower() == locationDTO.LocationID.ToLower()) != null)
+				if (await _locationRepository.GetAsync(e => e.LocationId.ToLower() == locationDTO.LocationId.ToLower()) != null)
 				{
-					return BadRequest("trung ten thiet bi");
+					return BadRequest("trung ten location");
 				}
 
 				Location location = _mapper.Map<Location>(locationDTO);
-				await _locationRepository.UpdateAsync(location);
+				await _locationRepository.CreateAsync(location);
 				return Ok(location);
 			}
 			catch
 			{ return BadRequest(); }
 		}
+
+
+
 		[HttpDelete]
 		public async Task<IActionResult> DeleteLocation([FromQuery] string name)
 		{
@@ -75,7 +78,7 @@ namespace Fablab.Controllers
 			{
 				return BadRequest();
 			}
-			var location = await _locationRepository.GetAsync(e => e.LocationID == name);
+			var location = await _locationRepository.GetAsync(e => e.LocationId == name);
 			if (location == null)
 			{
 				return NotFound();
@@ -84,9 +87,34 @@ namespace Fablab.Controllers
 			return Ok(location);
 		}
 
+		[HttpPut]
+		public async Task<ActionResult> PutLocation([FromBody] LocationDTO locationDTO)
+		{
+			try
+			{
+				if (locationDTO == null)
+				{
+					return BadRequest();
+				}
+				var location = await _locationRepository.GetAsync(e => e.LocationId == locationDTO.LocationId);
+				if (location == null)
+				{
+					return NotFound();
+				}
+
+				Location location1 = _mapper.Map<Location>(locationDTO);
+
+				await _locationRepository.UpdateAsync(location1);
+
+				return Ok(location1);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex);
+			}
+
+		}
 
 	}
 
-
-
-}
+	}

@@ -2,8 +2,9 @@
 
 namespace Fablab.Models.DTO
 {
-	public class UpdateEquip
+	public class PutEquipmentDTO
 	{
+		public string EquipmentId { get; set; }
 		public string EquipmentName { get; set; }
 		public DateTime YearOfSupply { get; set; }
 		public string CodeOfManager { get; set; }

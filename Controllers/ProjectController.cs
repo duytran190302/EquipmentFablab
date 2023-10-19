@@ -6,6 +6,7 @@ using Fablab.Repository.Implementation;
 using Fablab.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Xml.Linq;
 
 namespace Fablab.Controllers
 {
@@ -54,7 +55,7 @@ namespace Fablab.Controllers
 				if (!string.IsNullOrEmpty(search))
 				{
 					ProjectList = ProjectList.Where(e => e.ProjectName.Contains(search));
-					var ProjectListDTO = _mapper.Map<List<EquipmentDTO>>(ProjectList);
+					var ProjectListDTO = _mapper.Map<List<ProjectDTO>>(ProjectList);
 					return Ok(ProjectListDTO);
 				}
 				else
@@ -87,15 +88,19 @@ namespace Fablab.Controllers
 
 
 		[HttpPut]
-		public async Task<IActionResult> UpdateProject(string name, [FromBody] UpdateProject updateProject)
+		public async Task<IActionResult> UpdateProject( [FromBody] UpdateProject updateProject)
 		{
 			try
 			{
-				if (updateProject == null || name != updateProject.ProjectName)
+				if (await _projectRepository.GetAsync(e => e.ProjectName.ToLower() == updateProject.ProjectName.ToLower()) == null)
+				{
+					return BadRequest("khong co du an");
+				}
+				if (updateProject == null )
 				{
 					return BadRequest();
 				}
-				var project = _dataContext.Project.FirstOrDefault(x => x.ProjectName == name);
+				var project = _dataContext.Project.FirstOrDefault(x => x.ProjectName == updateProject.ProjectName);
 				project.StartDate = updateProject.StartDate;
 				project.EndDate = updateProject.EndDate;
 				project.Approved = updateProject.Approved;
@@ -112,21 +117,39 @@ namespace Fablab.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> AddProject([FromBody] AddProjectDTO addProjectDTO)
+		public async Task<IActionResult> PostProject([FromBody] PostProjectDTO postProjectDTO)
 		{
-			if (await _projectRepository.GetAsync(e => e.ProjectName.ToLower() == addProjectDTO.ProjectName.ToLower()) != null)
+			if (await _projectRepository.GetAsync(e => e.ProjectName.ToLower() == postProjectDTO.ProjectName.ToLower()) != null)
 			{
 				return BadRequest("trung ten du an");
 			}
-			if (addProjectDTO == null)
+			if (postProjectDTO == null)
 			{
-				return BadRequest(addProjectDTO);
+				return BadRequest(postProjectDTO);
 			}
 
-			Project project = _mapper.Map<Project>(addProjectDTO);
+			Project project = _mapper.Map<Project>(postProjectDTO);
 			project.Approved = false;
 			await _projectRepository.CreateAsync(project);
 			return Ok(project);
 		}
+		[HttpPut("Approve")]
+		public async Task<IActionResult> ApproveProject([FromBody] ApproveProject approveProject)
+		{
+			if (await _projectRepository.GetAsync(e => e.ProjectName.ToLower() == approveProject.ProjectName.ToLower()) == null)
+			{
+				return BadRequest("khong co du an");
+			}
+			if (approveProject == null)
+			{
+				return BadRequest(approveProject);
+			}
+
+			var project = _dataContext.Project.FirstOrDefault(x => x.ProjectName == approveProject.ProjectName);
+			project.Approved = approveProject.Approved;
+			await _projectRepository.UpdateAsync(project);
+			return Ok(project);
+		}
+
 	}
 }

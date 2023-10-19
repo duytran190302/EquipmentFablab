@@ -2,6 +2,7 @@ using Fablab.Data;
 using Fablab.Helpers.Mapper;
 using Fablab.Repository.Implementation;
 using Fablab.Repository.Interface;
+using GraphQL;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Xml.Linq;
@@ -16,11 +17,15 @@ namespace Fablab
 
 			// Add services to the container.
 
-			builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); 
+			builder.Services.AddControllers()
+			.AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+		    .AddNewtonsoftJson(); 
 
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
+			builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+
 			builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
 			builder.Services.AddScoped<IEquipmentTypeRepository, EquipmentTypeRepository>();
 			builder.Services.AddScoped<IBorrowRepository,BorrowRepository>();
@@ -30,6 +35,7 @@ namespace Fablab
 			builder.Services.AddDbContext<DataContext>(options =>
 			{
 				options.UseSqlServer(builder.Configuration.GetConnectionString("Fablab"));
+				options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 			});
 
 			var app = builder.Build();

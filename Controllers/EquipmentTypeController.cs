@@ -22,24 +22,24 @@ namespace Fablab.Controllers
 
 		}
 
-		[HttpGet()]
-		public async Task<IActionResult> GetEquipmentType([FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
+		[HttpGet]
+		public async Task<IActionResult> GetEquipmentTypes([FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
 		{
 			try
 			{
-				IEnumerable<EquipmentType> EquipmentTypeList;
-				EquipmentTypeList = await _equipmentTypeRepository.GetAllAsync(pageSize: pageSize,
+				IEnumerable<EquipmentType> equipmentTypesList;
+				equipmentTypesList = await _equipmentTypeRepository.GetAllAsync(pageSize: pageSize,
 							pageNumber: pageNumber);
 				if (!string.IsNullOrEmpty(search))
 				{
-					EquipmentTypeList = EquipmentTypeList.Where(e => e.Id.Contains(search));
-					var EquipmentTypeListDTO = _mapper.Map<List<EquipmentTypeDTO>>(EquipmentTypeList);
-					return Ok(EquipmentTypeListDTO);
+					equipmentTypesList = equipmentTypesList.Where(e => e.EquipmentTypeId.Contains(search));
+					var equipmentTypesListDTO = _mapper.Map<List<EquipmentType>>(equipmentTypesList);
+					return Ok(equipmentTypesListDTO);
 				}
 				else
 				{
-					var EquipmentTypeListDTO = _mapper.Map<List<EquipmentTypeDTO>>(EquipmentTypeList);
-					return Ok(EquipmentTypeListDTO);
+					var equipmentTypesListDTO = _mapper.Map<List<EquipmentTypeDTO>>(equipmentTypesList);
+					return Ok(equipmentTypesListDTO);
 				}
 			}
 			catch
@@ -50,7 +50,7 @@ namespace Fablab.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> AddEquipmentType([FromBody] EquipmentTypeDTO equipmentTypeDTO)
+		public async Task<IActionResult> PostEquipmentType([FromBody] EquipmentTypeDTO equipmentTypeDTO  )
 		{
 			try
 			{
@@ -58,18 +58,19 @@ namespace Fablab.Controllers
 				{
 					return BadRequest();
 				}
-				if (await _equipmentTypeRepository.GetAsync(e => e.Id.ToLower() == equipmentTypeDTO.Id.ToLower()) != null)
+				if (await _equipmentTypeRepository.GetAsync(e => e.EquipmentTypeId.ToLower() == equipmentTypeDTO.EquipmentTypeId.ToLower()) != null)
 				{
-					return BadRequest("trung ten thiet bi");
+					return BadRequest("trung ten equipmenttype");
 				}
 
 				EquipmentType equipmentType = _mapper.Map<EquipmentType>(equipmentTypeDTO);
-				await _equipmentTypeRepository.UpdateAsync(equipmentType);
+				await _equipmentTypeRepository.CreateAsync(equipmentType);
 				return Ok(equipmentType);
 			}
 			catch
 			{ return BadRequest(); }
 		}
+
 
 
 		[HttpDelete]
@@ -79,13 +80,41 @@ namespace Fablab.Controllers
 			{
 				return BadRequest();
 			}
-			var equipmentType = await _equipmentTypeRepository.GetAsync(e => e.Id == name);
+			var equipmentType = await _equipmentTypeRepository.GetAsync(e => e.EquipmentTypeId == name);
 			if (equipmentType == null)
 			{
 				return NotFound();
 			}
 			await _equipmentTypeRepository.RemoveAsync(equipmentType);
 			return Ok(equipmentType);
+		}
+
+		[HttpPut]
+		public async Task<ActionResult> PutEquipmentType([FromBody] EquipmentTypeDTO equipmentTypeDTO)
+		{
+			try
+			{
+				if (equipmentTypeDTO == null)
+				{
+					return BadRequest();
+				}
+				var equipmentType = await _equipmentTypeRepository.GetAsync(e => e.EquipmentTypeId == equipmentTypeDTO.EquipmentTypeId);
+				if (equipmentType == null)
+				{
+					return NotFound();
+				}
+
+				EquipmentType equipmentType1 = _mapper.Map<EquipmentType>(equipmentTypeDTO);
+
+				await _equipmentTypeRepository.UpdateAsync(equipmentType1);
+
+				return Ok(equipmentType1);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex);
+			}
+
 		}
 	}
 }

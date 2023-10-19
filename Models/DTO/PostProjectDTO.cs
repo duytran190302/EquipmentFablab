@@ -1,6 +1,6 @@
 ﻿namespace Fablab.Models.DTO
 {
-	public class AddProjectDTO
+	public class PostProjectDTO
 	{
 		public string ProjectName { get; set; }
 		public DateTime StartDate { get; set; }
