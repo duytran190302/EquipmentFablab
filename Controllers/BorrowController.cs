@@ -6,6 +6,7 @@ using Fablab.Repository.Implementation;
 using Fablab.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Immutable;
 
 namespace Fablab.Controllers
 {
@@ -15,54 +16,228 @@ namespace Fablab.Controllers
 	{
 		private readonly IBorrowRepository _borrowRepository;
 		private readonly IMapper _mapper;
+		private readonly IEquipmentRepository _equipmentRepository;
+		private readonly IProjectRepository _projectRepository;
 		private readonly DataContext _dataContext;
 
-		public BorrowController(IBorrowRepository borrowRepository, IMapper mapper, DataContext dataContext) 
+		public BorrowController(IBorrowRepository borrowRepository, IMapper mapper,DataContext dataContext, IEquipmentRepository equipmentRepository, IProjectRepository projectRepository) 
 		{
 			_borrowRepository = borrowRepository;
 			_mapper = mapper;
+			_equipmentRepository = equipmentRepository;
+			_projectRepository = projectRepository;
 			_dataContext= dataContext;
+
+		}
+
+		[HttpGet("Search")]
+		public async Task<IActionResult> SearchBorrow(
+			[FromQuery] string? borrowId,
+			[FromQuery] string? borrower,
+			[FromQuery] int? borrowMonth,
+			[FromQuery] bool? returned,
+			[FromQuery] bool? onSide,
+
+
+			[FromQuery] string? projectName,
+			[FromQuery] string? equipment,
+
+			int pageSize = 0, int pageNumber = 1)
+		{
+			try
+			{
+				IEnumerable<Borrow> borrowList;
+				var borrowListFromProject= new List<Borrow>();
+
+				borrowList = await _borrowRepository.SearchBorrowAsync();
+
+				if (!string.IsNullOrEmpty(borrowId))
+				{ borrowList = borrowList.Where(e => e.BorrowId == borrowId); }
+				if (!string.IsNullOrEmpty(borrower))
+				{ borrowList = borrowList.Where(e => e.Borrower == borrower); }
+				if (borrowMonth != null)
+				{ borrowList = borrowList.Where(e => e.BorrowedDate.Month == borrowMonth); }
+				if (returned != null)
+				{ 
+					if (returned== true) 
+					{
+						borrowList = borrowList.Where(e => e.RealReturnedDate != null);
+					}
+					else { borrowList = borrowList.Where(e => e.RealReturnedDate == null); }
+				}
+				if (onSide != null)
+				{ borrowList = borrowList.Where(e => e.OnSide == onSide); }
+				// tim theo ten du an
+				if (!string.IsNullOrEmpty(projectName))
+				{ borrowList = borrowList.Where(e => e.Project.ProjectName == projectName); }
+				// tim theo ten equipment
+
+				if (!string.IsNullOrEmpty(equipment))
+				{
+					foreach (var borrow in borrowList)
+					{
+						if (borrow.Equipments.FirstOrDefault(x => x.EquipmentId == equipment) != null)
+						{
+							borrowListFromProject.Add(borrow);
+						}
+					}
+					borrowList= borrowListFromProject;
+				}
+
+
+
+				borrowList = borrowList.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList();
+				var borrowListDTO = _mapper.Map<List<BorrowDTO>>(borrowList);
+				return Ok(borrowListDTO);
+
+			}
+			catch
+			{
+				return NotFound();
+			}
+
 		}
 
 
-
-		[HttpPost]
-		public async Task<IActionResult> AddBorrow([FromBody] BorrowDTO borrowDTO)
+		[HttpGet]
+		public async Task<IActionResult> GetBorrows([FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
 		{
-	
+			try
+			{
+				IEnumerable<Borrow> borrowList;
+				borrowList = await _borrowRepository.GetAllBorrowAsync(pageSize: pageSize,
+							pageNumber: pageNumber);
 
-			if (borrowDTO == null)
+				if (!string.IsNullOrEmpty(search))
+				{
+					borrowList = borrowList.Where(e => e.BorrowId.Contains(search));
+					var borrowListDTO = _mapper.Map<List<GetBorrowDTO>>(borrowList);
+					return Ok(borrowListDTO);
+				}
+				else
+				{
+					var borrowListDTO = _mapper.Map<List<GetBorrowDTO>>(borrowList);
+					return Ok(borrowListDTO);
+				}
+			}
+			catch
+			{
+				return NotFound();
+			}
+
+		}
+
+		[HttpPost("Borrow")]
+		public async Task<IActionResult> PostBorrow([FromBody] PostBorrowDTO postBorrowDTO)
+		{
+			try
+			{
+
+				if (postBorrowDTO == null)
+				{
+					return BadRequest();
+				}
+				var existProject = await _projectRepository.GetAsync(e => e.ProjectName == postBorrowDTO.ProjectName);
+				if (existProject.Approved == true)
+				{
+					//Borrow borrow = _mapper.Map<Borrow>(postBorrowDTO);
+
+					
+  
+					 var borrow = await _borrowRepository.PostBorrowAsync(postBorrowDTO);
+					await _borrowRepository.ChangeEquipmentOfBorrowAsync(borrow, true);
+
+					if (borrow.Equipments != null) { return Ok(); }
+					else { return NotFound(); }
+					
+				}
+				return BadRequest("chua duoc phe duyet");
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		[HttpPut("Return")]
+		public async Task<ActionResult> ReturnBorrow([FromQuery] string borrowId, [FromQuery] DateTime realReturnedDate )
+		{
+			try
+			{
+				if (borrowId == null)
+				{
+					return BadRequest();
+				}
+				var borrow = await _borrowRepository.GetBorrowByNameAsync(borrowId);
+				if (borrow == null)
+				{
+					return NotFound();
+				}
+				borrow.RealReturnedDate = realReturnedDate;
+
+
+				//await _borrowRepository.UpdateAsync(borrow);
+
+				await _borrowRepository.ChangeEquipmentOfBorrowAsync(borrow, false);
+
+				return Ok();
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex);
+			}
+
+
+
+		}
+		[HttpPut]
+		public async Task<ActionResult> PutBorrow([FromBody] PutBorrowDTO putBorrowDTO)
+		{
+			try
+			{
+				if (putBorrowDTO == null)
+				{
+					return BadRequest();
+				}
+				var borrow = await _borrowRepository.GetAsync(e => e.BorrowId == putBorrowDTO.BorrowId);
+				if (borrow == null)
+				{
+					return NotFound();
+				}
+
+				Borrow borrow1 = _mapper.Map<Borrow>(putBorrowDTO);
+
+				await _borrowRepository.UpdateAsync(borrow1);
+				var borrow2 = await _borrowRepository.GetAsync(e => e.BorrowId == putBorrowDTO.BorrowId);
+
+				return Ok(borrow2);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex);
+			}
+
+
+
+		}
+		[HttpDelete]
+		public async Task<IActionResult> DeleteBorrow([FromQuery] string name)
+		{
+			if (name == null)
 			{
 				return BadRequest();
 			}
-			if ( _dataContext.Project.Where(x=>x.ProjectName==borrowDTO.BorrowProject).FirstOrDefault().Approved == true)
+			var borrow = await _borrowRepository.GetAsync(e => e.BorrowId == name);
+			if (borrow == null)
 			{
-				Borrow borrow = _mapper.Map<Borrow>(borrowDTO);
-				borrow.Project= _dataContext.Project.FirstOrDefault(x=> x.ProjectName==borrowDTO.BorrowProject);
-
-
-				List<Equipment> equip = new List<Equipment>();
-
-				foreach (var EquipBorrow in borrowDTO.BorrowEquipment)
-				{
-					if (_dataContext.Equipment.Where(x => x.EquipmentName == EquipBorrow.ToString()).FirstOrDefault().Status.ToString() == "Active")
-					{
-						var eq = _dataContext.Equipment.FirstOrDefault(x=>x.EquipmentName== EquipBorrow.ToString());
-						equip.Add(eq);
-					}
-				}
-				//borrow.equipmentBorrows. = equip;
-				await _borrowRepository.CreateAsync(borrow);
-				await _borrowRepository.UpdateAsync(borrow);
-				return Ok(borrow);
-
-			}	
-				return BadRequest("chua duoc phe duyet");
-
+				return NotFound();
+			}
+			await _borrowRepository.RemoveAsync(borrow);
+			return Ok(borrow);
 		}
 
 
 
 
-		}
+	}
 }

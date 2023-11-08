@@ -9,7 +9,6 @@ namespace Fablab.Models.DTO
 		public DateTime EndDate { get; set; }
 		public string Description { get; set; }
 		public bool Approved { get; set; }
-		//
-		public List<Borrow> Borrows { get; set; }
+
 	}
 }

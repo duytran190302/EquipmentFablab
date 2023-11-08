@@ -13,7 +13,7 @@ namespace Fablab.Data
 		public DbSet<Equipment> Equipment { get; set; }
 		public DbSet<Project> Project { get; set; }
 		public DbSet <Supplier> Suppliers { get; set; }
-		public DbSet <EquipmentBorrow> EquipmentBorrows { get; set; }
+		//public DbSet <EquipmentBorrow> EquipmentBorrows { get; set; }
 
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,20 +27,7 @@ namespace Fablab.Data
 
 			modelBuilder.Entity<Equipment>().HasKey(e => e.EquipmentId);
 			modelBuilder.Entity<Borrow>().HasKey(p => p.BorrowId);
-
-
-			modelBuilder.Entity<EquipmentBorrow>()
-				.HasKey(p=> new {p.EquipmentId,p.BorrowId});
-			modelBuilder.Entity<EquipmentBorrow>()
-				.HasOne(p => p.Borrow)
-				.WithMany(p=>p.equipmentBorrows)
-				.HasForeignKey(p=>p.BorrowId);
-			modelBuilder.Entity<EquipmentBorrow>()
-				.HasOne(p => p.Equipment)
-				.WithMany(p => p.equipmentBorrows)
-				.HasForeignKey(p => p.EquipmentId);
-
-
+			modelBuilder.Entity<Borrow>().HasMany<Equipment>(b => b.Equipments).WithMany(e => e.Borrows);
 
 
 

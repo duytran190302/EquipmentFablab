@@ -6,6 +6,7 @@ using Fablab.Repository.Implementation;
 using Fablab.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace Fablab.Controllers
@@ -26,22 +27,58 @@ namespace Fablab.Controllers
 		}
 
 
-		[HttpGet]
-		public async Task<IActionResult> GetProjectByName(string name)
+		[HttpGet("Search")]
+		public async Task<IActionResult> SearchProject(
+			[FromQuery] string? projectName,
+			[FromQuery] DateTime? date,
+			[FromQuery] bool? approved,
+
+			[FromQuery] string? borrowId,
+
+			int pageSize = 0, int pageNumber = 1)
 		{
-			if (string.IsNullOrEmpty(name))
+			try
 			{
-				return BadRequest();
+				IEnumerable<Project> projectList;
+				projectList = await _projectRepository.SearchProjectAsync();
+
+				if (!string.IsNullOrEmpty(projectName))
+				{ projectList = projectList.Where(e => e.ProjectName == projectName); }
+				if (date!= null)
+				{ projectList = projectList.Where(e => e.StartDate <= date).Where(e=> e.EndDate >= date); }
+				if (approved != null)
+				{ projectList = projectList.Where(e => e.Approved == approved); }
+				
+				// tim borrow thuoc project nao
+				if (!string.IsNullOrEmpty(borrowId))
+				{ 
+					foreach (var project in projectList)
+					{
+						if (project.Borrows.FirstOrDefault(x=>x.BorrowId==borrowId)!=null)
+						{
+							projectList = new List<Project>() { project };
+							break;
+						}	
+
+
+						//var a = project.Borrows.Where(x=>x.BorrowId == borrowId);
+						//if (a!=null) 
+						//{
+						//	projectList = projectList.Where(x => x.Borrows == a);
+						//	break;
+						//}
+					}
+				}
+				projectList = projectList.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList();
+				var projectListDTO = _mapper.Map<List<SearchProjectDTO>>(projectList);
+				return Ok(projectListDTO);
+
 			}
-
-
-			var projects = await _projectRepository.GetProjectByNameAsync(name);
-			var equipmentDTOs = _mapper.Map<List<ProjectDTO>>(projects);
-			if (equipmentDTOs == null)
+			catch
 			{
 				return NotFound();
 			}
-			return Ok(equipmentDTOs);
+
 		}
 
 		[HttpGet("AllProject")]

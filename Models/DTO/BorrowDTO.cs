@@ -1,20 +1,15 @@
-﻿using Fablab.Models.Domain;
-using System.Collections;
-
-namespace Fablab.Models.DTO
+﻿namespace Fablab.Models.DTO
 {
 	public class BorrowDTO
 	{
-		public string BorrowId { get; set; }
+		public string BorrowId { get; set; } = string.Empty;
 		public DateTime BorrowedDate { get; set; }
 
 		public DateTime ReturnedDate { get; set; }
+		public DateTime? RealReturnedDate { get; set; }
 
 		public string Borrower { get; set; }
-		public string Reason { get; set; }
+		public string Reason { get; set; } = string.Empty;
 		public bool OnSide { get; set; }
-
-		public string BorrowProject { get; set; }
-		public List<string> BorrowEquipment { get; set; }
 	}
 }

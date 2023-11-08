@@ -67,7 +67,7 @@ namespace Fablab.Controllers
 		public async Task<IActionResult> SearchEquipments(
 			[FromQuery] string? equipmentId,
 			[FromQuery] string? equipmentName,
-			[FromQuery] DateTime? YearOfSupply,
+			[FromQuery] string? YearOfSupply,
 			[FromQuery] string? CodeOfManager,
 
 			[FromQuery] string? equipmentTypeId,
@@ -90,7 +90,7 @@ namespace Fablab.Controllers
 				if (!string.IsNullOrEmpty(equipmentName))
 				{ equipmentList = equipmentList.Where(e=>e.EquipmentName==equipmentName); }
 				if (YearOfSupply != null)
-				{ equipmentList = equipmentList.Where(e => e.YearOfSupply== YearOfSupply); }
+				{ equipmentList = equipmentList.Where(e => e.YearOfSupply.Year.ToString() == YearOfSupply); }
 				if (!string.IsNullOrEmpty(CodeOfManager))
 				{ equipmentList = equipmentList.Where(e => e.CodeOfManager == CodeOfManager); }
 				if (!string.IsNullOrEmpty(equipmentTypeId))

@@ -36,6 +36,7 @@ namespace Fablab
 			{
 				options.UseSqlServer(builder.Configuration.GetConnectionString("Fablab"));
 				options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+				//options.EnableSensitiveDataLogging();
 			});
 
 			var app = builder.Build();

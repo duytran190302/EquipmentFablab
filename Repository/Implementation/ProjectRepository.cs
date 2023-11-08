@@ -13,7 +13,7 @@ namespace Fablab.Repository.Implementation
 			_db = db;
 		}
 
-		public async Task<Project> UpdateAsync(Project entity)
+		public async Task<Project> UpdateAsync(Project entity) 
 		{
 			_db.Project.Update(entity);
 			await _db.SaveChangesAsync();
@@ -41,6 +41,14 @@ namespace Fablab.Repository.Implementation
 			}
 
 			return null;
+		}
+
+
+		public async Task<List<Project>> SearchProjectAsync()
+		{
+			var query = await _db.Project.Include(x => x.Borrows).ToListAsync();
+
+			return query;
 		}
 	}
 }

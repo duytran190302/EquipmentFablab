@@ -22,6 +22,21 @@ namespace Fablab.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("BorrowEquipment", b =>
+                {
+                    b.Property<string>("BorrowsBorrowId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EquipmentsEquipmentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BorrowsBorrowId", "EquipmentsEquipmentId");
+
+                    b.HasIndex("EquipmentsEquipmentId");
+
+                    b.ToTable("BorrowEquipment");
+                });
+
             modelBuilder.Entity("Fablab.Models.Domain.Borrow", b =>
                 {
                     b.Property<string>("BorrowId")
@@ -31,15 +46,21 @@ namespace Fablab.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Borrower")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("OnSide")
                         .HasColumnType("bit");
 
                     b.Property<string>("ProjectName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("RealReturnedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Reason")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ReturnedDate")
@@ -58,9 +79,11 @@ namespace Fablab.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CodeOfManager")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EquipmentName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EquipmentTypeId")
@@ -73,6 +96,7 @@ namespace Fablab.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SupplierName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("YearOfSupply")
@@ -89,21 +113,6 @@ namespace Fablab.Migrations
                     b.ToTable("Equipment");
                 });
 
-            modelBuilder.Entity("Fablab.Models.Domain.EquipmentBorrow", b =>
-                {
-                    b.Property<string>("EquipmentId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("BorrowId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("EquipmentId", "BorrowId");
-
-                    b.HasIndex("BorrowId");
-
-                    b.ToTable("EquipmentBorrows");
-                });
-
             modelBuilder.Entity("Fablab.Models.Domain.EquipmentType", b =>
                 {
                     b.Property<string>("EquipmentTypeId")
@@ -113,9 +122,11 @@ namespace Fablab.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EquipmentTypeName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Picture")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EquipmentTypeId");
@@ -129,6 +140,7 @@ namespace Fablab.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Note")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("LocationId");
@@ -145,6 +157,7 @@ namespace Fablab.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("EndDate")
@@ -164,9 +177,11 @@ namespace Fablab.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SupplierName");
@@ -174,11 +189,28 @@ namespace Fablab.Migrations
                     b.ToTable("Suppliers");
                 });
 
+            modelBuilder.Entity("BorrowEquipment", b =>
+                {
+                    b.HasOne("Fablab.Models.Domain.Borrow", null)
+                        .WithMany()
+                        .HasForeignKey("BorrowsBorrowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Fablab.Models.Domain.Equipment", null)
+                        .WithMany()
+                        .HasForeignKey("EquipmentsEquipmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Fablab.Models.Domain.Borrow", b =>
                 {
                     b.HasOne("Fablab.Models.Domain.Project", "Project")
                         .WithMany("Borrows")
-                        .HasForeignKey("ProjectName");
+                        .HasForeignKey("ProjectName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Project");
                 });
@@ -195,42 +227,15 @@ namespace Fablab.Migrations
 
                     b.HasOne("Fablab.Models.Domain.Supplier", "Supplier")
                         .WithMany()
-                        .HasForeignKey("SupplierName");
+                        .HasForeignKey("SupplierName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("EquipmentType");
 
                     b.Navigation("Location");
 
                     b.Navigation("Supplier");
-                });
-
-            modelBuilder.Entity("Fablab.Models.Domain.EquipmentBorrow", b =>
-                {
-                    b.HasOne("Fablab.Models.Domain.Borrow", "Borrow")
-                        .WithMany("equipmentBorrows")
-                        .HasForeignKey("BorrowId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Fablab.Models.Domain.Equipment", "Equipment")
-                        .WithMany("equipmentBorrows")
-                        .HasForeignKey("EquipmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Borrow");
-
-                    b.Navigation("Equipment");
-                });
-
-            modelBuilder.Entity("Fablab.Models.Domain.Borrow", b =>
-                {
-                    b.Navigation("equipmentBorrows");
-                });
-
-            modelBuilder.Entity("Fablab.Models.Domain.Equipment", b =>
-                {
-                    b.Navigation("equipmentBorrows");
                 });
 
             modelBuilder.Entity("Fablab.Models.Domain.Project", b =>
