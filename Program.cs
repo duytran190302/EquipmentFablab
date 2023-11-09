@@ -35,8 +35,7 @@ namespace Fablab
 			builder.Services.AddDbContext<DataContext>(options =>
 			{
 				options.UseSqlServer(builder.Configuration.GetConnectionString("Fablab"));
-				options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-				//options.EnableSensitiveDataLogging();
+				options.EnableSensitiveDataLogging();
 			});
 
 			var app = builder.Build();

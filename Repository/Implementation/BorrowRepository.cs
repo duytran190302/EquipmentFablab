@@ -88,18 +88,18 @@ namespace Fablab.Repository.Implementation
 				///Equipments= new List<Equipment> ()
 				Equipments = equipment
 			};
-			  _db.Attach(borrow); 
+			 /// _db.Attach(borrow); 
 			//var dbBorrow = _db.Borrow.Include(x=>x.Equipments).First();
 			await _db.Borrow.AddAsync(borrow);
 			await _db.SaveChangesAsync();
 
-			var dbBorrow = _db.Borrow.Include(x => x.Equipments).FirstOrDefault(x=>x.BorrowId==entity.BorrowId);
-			  dbBorrow.Equipments.AddRange(equipment);
-			await _db.SaveChangesAsync();
+			//var dbBorrow = _db.Borrow.Include(x => x.Equipments).FirstOrDefault(x=>x.BorrowId==entity.BorrowId);
+			//  dbBorrow.Equipments.AddRange(equipment);
+			//await _db.SaveChangesAsync();
 
 
 			var borrow2 = _db.Borrow.Include(x => x.Equipments).Include(x => x.Project).FirstOrDefault(x => x.BorrowId == entity.BorrowId);
-			return dbBorrow;
+			return borrow2;
 
 
 

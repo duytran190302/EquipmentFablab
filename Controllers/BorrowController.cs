@@ -199,18 +199,19 @@ namespace Fablab.Controllers
 				{
 					return BadRequest();
 				}
-				var borrow = await _borrowRepository.GetAsync(e => e.BorrowId == putBorrowDTO.BorrowId);
-				if (borrow == null)
-				{
-					return NotFound();
-				}
+				//var borrow = await _borrowRepository.GetAsync(e => e.BorrowId == putBorrowDTO.BorrowId);
+				//if (borrow == null)
+				//{
+				//	return NotFound();
+				//}
 
 				Borrow borrow1 = _mapper.Map<Borrow>(putBorrowDTO);
 
 				await _borrowRepository.UpdateAsync(borrow1);
-				var borrow2 = await _borrowRepository.GetAsync(e => e.BorrowId == putBorrowDTO.BorrowId);
 
-				return Ok(borrow2);
+				var borrow2 = await _borrowRepository.GetAsync(e => e.BorrowId == putBorrowDTO.BorrowId);
+				var borrow3 = _mapper.Map<BorrowDTO>(borrow2);
+				return Ok(borrow3);
 			}
 			catch (Exception ex)
 			{

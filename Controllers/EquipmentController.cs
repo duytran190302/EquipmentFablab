@@ -73,9 +73,10 @@ namespace Fablab.Controllers
 			[FromQuery] string? equipmentTypeId,
 			[FromQuery] string? equipmentTypeName,
 			[FromQuery] Category? Category,
-			
 
-			[FromQuery] string? equipmentStatus,
+			[FromQuery] string? borrow,
+
+			[FromQuery] EquipmentStatus? equipmentStatus,
 
 
 			int pageSize = 0, int pageNumber = 1)
@@ -83,6 +84,7 @@ namespace Fablab.Controllers
 			try
 			{
 				IEnumerable<Equipment> equipmentList;
+				var equipmentListFromBorrow= new List<Equipment>();
 				equipmentList = await _equipmentRepository.SearchEquipmentAsync();
 
 				if (!string.IsNullOrEmpty(equipmentId))
@@ -97,9 +99,23 @@ namespace Fablab.Controllers
 				{ equipmentList = equipmentList.Where(e=>e.EquipmentType.EquipmentTypeId==equipmentTypeId); }
 				if (!string.IsNullOrEmpty(equipmentTypeName))
 				{ equipmentList = equipmentList.Where(e=>e.EquipmentType.EquipmentTypeName==equipmentTypeName); }
+				if (equipmentStatus!= null)
+				{ equipmentList = equipmentList.Where(e => e.Status == equipmentStatus); }
 				if (Category != null)
 				{ equipmentList = equipmentList.Where(e => e.EquipmentType.Category == Category); }
 
+
+				if (!string.IsNullOrEmpty(borrow))
+				{
+					foreach (var equipment in equipmentList)
+					{
+						if (equipment.Borrows.FirstOrDefault(x => x.BorrowId == borrow) != null)
+						{
+							equipmentListFromBorrow.Add(equipment);
+						}
+					}
+					equipmentList = equipmentListFromBorrow;
+				}
 
 				equipmentList =equipmentList.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList();
 				var equipmentListDTO = _mapper.Map<List<EquipmentDTO>>(equipmentList);
