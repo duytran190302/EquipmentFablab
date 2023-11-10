@@ -47,7 +47,7 @@ namespace Fablab.Controllers
 			try
 			{
 				IEnumerable<Borrow> borrowList;
-				var borrowListFromProject= new List<Borrow>();
+				var borrowListFromEquipment= new List<Borrow>();
 
 				borrowList = await _borrowRepository.SearchBorrowAsync();
 
@@ -78,10 +78,10 @@ namespace Fablab.Controllers
 					{
 						if (borrow.Equipments.FirstOrDefault(x => x.EquipmentId == equipment) != null)
 						{
-							borrowListFromProject.Add(borrow);
+							borrowListFromEquipment.Add(borrow);
 						}
 					}
-					borrowList= borrowListFromProject;
+					borrowList= borrowListFromEquipment;
 				}
 
 
@@ -111,7 +111,7 @@ namespace Fablab.Controllers
 				if (!string.IsNullOrEmpty(search))
 				{
 					borrowList = borrowList.Where(e => e.BorrowId.Contains(search));
-					var borrowListDTO = _mapper.Map<List<GetBorrowDTO>>(borrowList);
+					var borrowListDTO = _mapper.Map<List<BorrowDTO>>(borrowList);
 					return Ok(borrowListDTO);
 				}
 				else

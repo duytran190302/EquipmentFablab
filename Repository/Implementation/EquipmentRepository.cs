@@ -48,7 +48,11 @@ namespace Fablab.Repository.Implementation
 
 		public async Task<List<Equipment>> SearchEquipmentAsync()
 		{
-			var query = await _db.Equipment.Include(x => x.Supplier).Include(x => x.Location).Include(x => x.EquipmentType).ToListAsync();
+			var query = await _db.Equipment.Include(x => x.Supplier)
+				.Include(x => x.Location).
+				Include(x => x.EquipmentType)
+				.Include(x=>x.Borrows)
+				.ToListAsync();
 
 			return query;
 		}

@@ -99,7 +99,7 @@ namespace Fablab.Controllers
 				{
 					return BadRequest();
 				}
-				var supplier = await _supplierRepository.GetAsync(e => e.SupplierName == supplierDTO.SupplierName);
+				var supplier = await _supplierRepository.GetAsync(e => e.SupplierName == supplierDTO.SupplierName, tracked: false);
 				if (supplier == null)
 				{
 					return NotFound();
