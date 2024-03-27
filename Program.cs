@@ -25,12 +25,19 @@ namespace Fablab
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 			builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
-
+			builder.Services.AddScoped<ITagRepository, TagRepository>();
 			builder.Services.AddScoped<IEquipmentRepository, EquipmentRepository>();
 			builder.Services.AddScoped<IEquipmentTypeRepository, EquipmentTypeRepository>();
 			builder.Services.AddScoped<IBorrowRepository,BorrowRepository>();
 			builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 			builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+			builder.Services.AddScoped<ISpecificationRepository, SpecificationRepository>();
+			builder.Services.AddScoped<IPictureRepository, PictureRepository>();
+
+			builder.Services.AddScoped(typeof(IRepos<,>), typeof(Repos<,>));
+			builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+			builder.Services.AddScoped<IPictureRepos, PictureRepos>();
+
 			builder.Services.AddAutoMapper(typeof(Program).Assembly);
 			builder.Services.AddDbContext<DataContext>(options =>
 			{

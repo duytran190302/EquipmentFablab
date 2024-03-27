@@ -15,11 +15,24 @@ namespace Fablab.Repository.Implementation
 			_db = db;
 		}
 
-		public async Task<Equipment> UpdateAsync(Equipment entity)
+		public async Task<Equipment> UpdateAsync(PostEquipmentDTO entity)
 		{
-			_db.Equipment.Update(entity);
+			//var supplier = await _db.Suppliers.FirstOrDefaultAsync(s => s.SupplierName == entity.EquipmentName);
+			var equipment = new Equipment()
+			{
+				EquipmentId = entity.EquipmentId,
+				EquipmentName = entity.EquipmentName,
+				YearOfSupply = entity.YearOfSupply,
+				CodeOfManager = entity.CodeOfManager,
+				Status = entity.Status,
+				Supplier = _db.Supplier.FirstOrDefault(e => e.SupplierName == entity.SupplierName),
+				Location = _db.Location.FirstOrDefault(e => e.LocationId == entity.LocationId),
+				EquipmentType = _db.EquipmentType.FirstOrDefault(e => e.EquipmentTypeId == entity.EquipmentTypeId),
+			};
+			_db.Attach(equipment);
+			_db.Equipment.Update(equipment);
 			await _db.SaveChangesAsync();
-			return entity;
+			return equipment;
 		}
 		public async Task<List<Equipment>> GetEquipmentByNameAsync(string name)
 		{
@@ -52,6 +65,7 @@ namespace Fablab.Repository.Implementation
 				.Include(x => x.Location).
 				Include(x => x.EquipmentType)
 				.Include(x=>x.Borrows)
+				
 				.ToListAsync();
 
 			return query;
@@ -67,14 +81,25 @@ namespace Fablab.Repository.Implementation
 				YearOfSupply=entity.YearOfSupply,
 				CodeOfManager=entity.CodeOfManager,
 				Status=entity.Status,
-				Supplier= _db.Suppliers.FirstOrDefault(e => e.SupplierName == entity.SupplierName),
+				Supplier= _db.Supplier.FirstOrDefault(e => e.SupplierName == entity.SupplierName),
 				Location = _db.Location.FirstOrDefault(e=>e.LocationId==entity.LocationId),
-				EquipmentType= _db.EquipmentTypes.FirstOrDefault(e=>e.EquipmentTypeId==entity.EquipmentTypeId),
+				EquipmentType= _db.EquipmentType.FirstOrDefault(e=>e.EquipmentTypeId==entity.EquipmentTypeId),
 			};
 			_db.Attach(equipment);
 			_db.Equipment.Add(equipment);
 			await _db.SaveChangesAsync();
 			return equipment;
+		}
+
+		public async Task<List<Equipment>> SearchEquipmentAsync1()
+		{
+			var query = await _db.Equipment.Include(x => x.Supplier)
+	.Include(x => x.Location).
+	Include(x => x.EquipmentType)
+	//.Include(x => x.Borrows)
+	.ToListAsync();
+
+			return query;
 		}
 	}
 }

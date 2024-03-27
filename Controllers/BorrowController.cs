@@ -127,6 +127,26 @@ namespace Fablab.Controllers
 
 		}
 
+		// Viết thêm get cac Equipment đẻ borrow : kiểm tra dự án duyệt chưa để gửi ds theiets bị thuộc dự án đó
+		[HttpGet("Equipment")]
+		public async Task<IActionResult> GetEquipmentForBorrows([FromQuery] string project, int pageSize = 0, int pageNumber = 1)
+		{
+			try
+			{
+				List<Equipment> equipments = await _borrowRepository.SearchEquipmentForBorrowAsync(project);
+				equipments = equipments.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList();
+				var equipmentListDTO = _mapper.Map<List<EquipmentDTO>>(equipments);
+				return Ok(equipmentListDTO);
+
+			}
+			catch
+			{
+				return NotFound();
+			}
+
+		}
+
+
 		[HttpPost("Borrow")]
 		public async Task<IActionResult> PostBorrow([FromBody] PostBorrowDTO postBorrowDTO)
 		{
@@ -137,7 +157,7 @@ namespace Fablab.Controllers
 				{
 					return BadRequest();
 				}
-				var existProject = await _projectRepository.GetAsync(e => e.ProjectName == postBorrowDTO.ProjectName);
+				var existProject = await _projectRepository.GetAsync(e => e.ProjectName == postBorrowDTO.ProjectName,tracked: false);
 				if (existProject.Approved == true)
 				{
 					//Borrow borrow = _mapper.Map<Borrow>(postBorrowDTO);
@@ -160,27 +180,27 @@ namespace Fablab.Controllers
 		}
 
 		[HttpPut("Return")]
-		public async Task<ActionResult> ReturnBorrow([FromQuery] string borrowId, [FromQuery] DateTime realReturnedDate )
+		public async Task<ActionResult> ReturnBorrow([FromBody] ReturnBorrowDTO returnBorrowDTO)
 		{
 			try
 			{
-				if (borrowId == null)
+				if (returnBorrowDTO.BorrowId == null)
 				{
 					return BadRequest();
 				}
-				var borrow = await _borrowRepository.GetBorrowByNameAsync(borrowId);
+				var borrow = await _borrowRepository.GetBorrowByNameAsync(returnBorrowDTO.BorrowId);
 				if (borrow == null)
 				{
 					return NotFound();
 				}
-				borrow.RealReturnedDate = realReturnedDate;
+				borrow.RealReturnedDate = returnBorrowDTO.RealReturnedDate;
 
 
-				//await _borrowRepository.UpdateAsync(borrow);
+				await _borrowRepository.UpdateAsync(borrow);
 
 				await _borrowRepository.ChangeEquipmentOfBorrowAsync(borrow, false);
 
-				return Ok();
+				return Ok(borrow.BorrowId);
 			}
 			catch (Exception ex)
 			{

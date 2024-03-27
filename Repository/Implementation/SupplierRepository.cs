@@ -14,7 +14,7 @@ namespace Fablab.Repository.Implementation
 
 		public async Task<Supplier> UpdateAsync(Supplier entity)
 		{
-			_db.Suppliers.Update(entity);
+			_db.Supplier.Update(entity);
 			await _db.SaveChangesAsync();
 			return entity;
 		}

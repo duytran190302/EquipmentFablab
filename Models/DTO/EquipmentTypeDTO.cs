@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Fablab.Models.DTO
 {
-	public class EquipmentTypeDTO
+	public class EquipmentTypeDTO2
 	{
 		public string EquipmentTypeId { get; set; }
 		public string Picture { get; set; }

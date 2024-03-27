@@ -96,7 +96,7 @@ namespace Fablab.Controllers
 				{
 					return BadRequest();
 				}
-				var location = await _locationRepository.GetAsync(e => e.LocationId == locationDTO.LocationId);
+				var location = await _locationRepository.GetAsync(e => e.LocationId == locationDTO.LocationId, tracked: false);
 				if (location == null)
 				{
 					return NotFound();

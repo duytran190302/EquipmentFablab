@@ -2,6 +2,7 @@
 using Fablab.Data;
 using Fablab.Models.Domain;
 using Fablab.Models.DTO;
+using Fablab.Models.DTO.ProjectFolder;
 using Fablab.Repository.Implementation;
 using Fablab.Repository.Interface;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +12,7 @@ using System.Xml.Linq;
 
 namespace Fablab.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class ProjectController : ControllerBase
 	{
@@ -70,8 +71,25 @@ namespace Fablab.Controllers
 					}
 				}
 				projectList = projectList.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToList();
-				var projectListDTO = _mapper.Map<List<SearchProjectDTO>>(projectList);
-				return Ok(projectListDTO);
+
+				foreach (var project in projectList)
+				{
+					foreach ( var i in project.Equipments)
+					{
+						i.Borrows = null;
+
+						i.EquipmentType = null;
+					}
+					foreach (var i in project.Borrows)
+					{
+						i.Project = null;
+						i.Equipments = null;
+						 
+					}
+				}
+				return Ok(projectList);
+				//var projectListDTO = _mapper.Map<List<SearchProjectDTO>>(projectList);
+
 
 			}
 			catch
@@ -80,7 +98,23 @@ namespace Fablab.Controllers
 			}
 
 		}
+		[HttpGet("Equipment")]
+		public async Task<IActionResult> GetSuppliers([FromQuery] string projectName)
+		{
+			try
+			{
+				IEnumerable<Equipment> equipments;
+				equipments = await _projectRepository.SearchEquipmentAsync(projectName);
+				var equipmentListDTO = _mapper.Map<List<EquipmentDTO>>(equipments);
+				return Ok(equipmentListDTO);
 
+			}
+			catch
+			{
+				return NotFound();
+			}
+
+		}
 		[HttpGet("AllProject")]
 		public async Task<IActionResult> GetAllProjects([FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
 		{
@@ -170,6 +204,23 @@ namespace Fablab.Controllers
 			await _projectRepository.CreateAsync(project);
 			return Ok(project);
 		}
+
+		[HttpPost("Init")]
+		public async Task<IActionResult> PostProjectWithEquipment([FromBody] PostProjectDTO2 postProjectDTO)
+		{
+			if (await _projectRepository.GetAsync(e => e.ProjectName.ToLower() == postProjectDTO.ProjectName.ToLower()) != null)
+			{
+				return BadRequest("trung ten du an");
+			}
+			if (postProjectDTO == null)
+			{
+				return BadRequest(postProjectDTO);
+			}
+
+			await _projectRepository.PostProjectAsync(postProjectDTO);
+			return Ok(postProjectDTO);
+		}
+
 		[HttpPut("Approve")]
 		public async Task<IActionResult> ApproveProject([FromBody] ApproveProject approveProject)
 		{
@@ -184,6 +235,25 @@ namespace Fablab.Controllers
 
 			var project = _dataContext.Project.FirstOrDefault(x => x.ProjectName == approveProject.ProjectName);
 			project.Approved = approveProject.Approved;
+			await _projectRepository.UpdateAsync(project);
+			return Ok(project);
+		}
+
+		[HttpPut("End")]
+		public async Task<IActionResult> EndProject([FromBody] EndProjectDTO endProject)
+		{
+			if (await _projectRepository.GetAsync(e => e.ProjectName.ToLower() == endProject.ProjectName.ToLower()) == null)
+			{
+				return BadRequest("khong co du an");
+			}
+			if (endProject == null)
+			{
+				return BadRequest(endProject);
+			}
+
+			var project = _dataContext.Project.FirstOrDefault(x => x.ProjectName == endProject.ProjectName);
+			project.RealEndDate = endProject.RealEndDate;
+			project.Equipments = null;
 			await _projectRepository.UpdateAsync(project);
 			return Ok(project);
 		}

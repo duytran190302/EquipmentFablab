@@ -12,6 +12,7 @@ namespace Fablab.Repository.Interface
 		Task ChangeEquipmentOfBorrowAsync(Borrow entity, bool active);
 		Task<List<Borrow>> GetAllBorrowAsync(int pageSize = 0, int pageNumber = 1);
 		Task<Borrow> GetBorrowByNameAsync(string name);
+		Task<List<Equipment>> SearchEquipmentForBorrowAsync(string projectName);
 
 	}
 }

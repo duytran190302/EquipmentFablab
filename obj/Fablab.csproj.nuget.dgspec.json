@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ACER\\source\\repos\\Fablab\\Fablab.csproj": {}
+    "C:\\Users\\ACER\\Documents\\HK7\\Fablab\\Fablab.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ACER\\source\\repos\\Fablab\\Fablab.csproj": {
+    "C:\\Users\\ACER\\Documents\\HK7\\Fablab\\Fablab.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ACER\\source\\repos\\Fablab\\Fablab.csproj",
+        "projectUniqueName": "C:\\Users\\ACER\\Documents\\HK7\\Fablab\\Fablab.csproj",
         "projectName": "Fablab",
-        "projectPath": "C:\\Users\\ACER\\source\\repos\\Fablab\\Fablab.csproj",
+        "projectPath": "C:\\Users\\ACER\\Documents\\HK7\\Fablab\\Fablab.csproj",
         "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ACER\\source\\repos\\Fablab\\obj\\",
+        "outputPath": "C:\\Users\\ACER\\Documents\\HK7\\Fablab\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -135,7 +135,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

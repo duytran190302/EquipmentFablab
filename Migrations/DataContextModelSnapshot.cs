@@ -92,6 +92,13 @@ namespace Fablab.Migrations
                     b.Property<string>("LocationId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ProjectName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProjectName1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -108,6 +115,8 @@ namespace Fablab.Migrations
 
                     b.HasIndex("LocationId");
 
+                    b.HasIndex("ProjectName1");
+
                     b.HasIndex("SupplierName");
 
                     b.ToTable("Equipment");
@@ -121,17 +130,17 @@ namespace Fablab.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
-                    b.Property<string>("EquipmentTypeName")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Picture")
+                    b.Property<string>("EquipmentTypeName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EquipmentTypeId");
 
-                    b.ToTable("EquipmentTypes");
+                    b.ToTable("EquipmentType");
                 });
 
             modelBuilder.Entity("Fablab.Models.Domain.Location", b =>
@@ -146,6 +155,23 @@ namespace Fablab.Migrations
                     b.HasKey("LocationId");
 
                     b.ToTable("Location");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.Picture", b =>
+                {
+                    b.Property<string>("EquipmentTypeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("PictureId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("FileData")
+                        .IsRequired()
+                        .HasColumnType("VARBINARY(MAX)");
+
+                    b.HasKey("EquipmentTypeId", "PictureId");
+
+                    b.ToTable("Picture");
                 });
 
             modelBuilder.Entity("Fablab.Models.Domain.Project", b =>
@@ -163,12 +189,36 @@ namespace Fablab.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("RealEndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("ProjectName");
 
                     b.ToTable("Project");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.Specification", b =>
+                {
+                    b.Property<string>("EquipmentTypeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EquipmentTypeId", "Name");
+
+                    b.ToTable("Specification");
                 });
 
             modelBuilder.Entity("Fablab.Models.Domain.Supplier", b =>
@@ -186,7 +236,26 @@ namespace Fablab.Migrations
 
                     b.HasKey("SupplierName");
 
-                    b.ToTable("Suppliers");
+                    b.ToTable("Supplier");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.Tag", b =>
+                {
+                    b.Property<string>("TagId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EquipmentTypeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("TagDetail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TagId");
+
+                    b.HasIndex("EquipmentTypeId");
+
+                    b.ToTable("Tag");
                 });
 
             modelBuilder.Entity("BorrowEquipment", b =>
@@ -225,6 +294,12 @@ namespace Fablab.Migrations
                         .WithMany()
                         .HasForeignKey("LocationId");
 
+                    b.HasOne("Fablab.Models.Domain.Project", "Project")
+                        .WithMany("Equipments")
+                        .HasForeignKey("ProjectName1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Fablab.Models.Domain.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierName")
@@ -235,12 +310,54 @@ namespace Fablab.Migrations
 
                     b.Navigation("Location");
 
+                    b.Navigation("Project");
+
                     b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.Picture", b =>
+                {
+                    b.HasOne("Fablab.Models.Domain.EquipmentType", "EquipmentType")
+                        .WithMany("Pictures")
+                        .HasForeignKey("EquipmentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EquipmentType");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.Specification", b =>
+                {
+                    b.HasOne("Fablab.Models.Domain.EquipmentType", "EquipmentType")
+                        .WithMany("Specifications")
+                        .HasForeignKey("EquipmentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EquipmentType");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.Tag", b =>
+                {
+                    b.HasOne("Fablab.Models.Domain.EquipmentType", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("EquipmentTypeId");
+                });
+
+            modelBuilder.Entity("Fablab.Models.Domain.EquipmentType", b =>
+                {
+                    b.Navigation("Pictures");
+
+                    b.Navigation("Specifications");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Fablab.Models.Domain.Project", b =>
                 {
                     b.Navigation("Borrows");
+
+                    b.Navigation("Equipments");
                 });
 #pragma warning restore 612, 618
         }

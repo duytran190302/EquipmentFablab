@@ -1,5 +1,6 @@
 ﻿using Fablab.Data;
 using Fablab.Models.Domain;
+using Fablab.Models.DTO.ProjectFolder;
 using Fablab.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,7 +36,7 @@ namespace Fablab.Repository.Implementation
 				{
 					pageSize = 100;
 				}
-				var query = await _db.Project.Include(x => x.Borrows)
+				var query = await _db.Project.Include(x => x.Borrows).Include(x=>x.Borrows)
 					.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
 				return query;
 			}
@@ -46,9 +47,47 @@ namespace Fablab.Repository.Implementation
 
 		public async Task<List<Project>> SearchProjectAsync()
 		{
-			var query = await _db.Project.Include(x => x.Borrows).ToListAsync();
+			var query = await _db.Project.Include(x => x.Borrows).Include(x=>x.Equipments).ToListAsync();
 
 			return query;
+		}
+
+		public async Task<PostProjectDTO2> PostProjectAsync(PostProjectDTO2 entity)
+		{
+			var Equipment = _db.Equipment.Where(x => entity.Equipments.Contains(x.EquipmentId)).ToList();
+
+			// them phan doi Project cua cac equipment
+			var project = new Project()
+			{
+				ProjectName = entity.ProjectName,
+				StartDate = entity.StartDate,
+				EndDate = entity.EndDate,
+				Description = entity.Description,
+				Approved = false,
+				///Equipments= new List<Equipment> ()
+				Equipments = Equipment,
+			};
+			/// _db.Attach(borrow); 
+			//var dbBorrow = _db.Borrow.Include(x=>x.Equipments).First();
+
+
+			await _db.Project.AddAsync(project);
+			await _db.SaveChangesAsync();
+
+
+			return entity;
+		}
+
+		public Task<Project> EndProjectAsync(EndProjectDTO endProjectDTO)
+		{
+			throw new NotImplementedException();
+		}
+
+		public async Task<List<Equipment>> SearchEquipmentAsync(string equipmentName)
+		{
+			var query =  _db.Project.Include(x => x.Equipments).Where(x=>x.ProjectName==equipmentName).FirstOrDefault();
+			var a = query.Equipments.ToList();
+			return a;
 		}
 	}
 }

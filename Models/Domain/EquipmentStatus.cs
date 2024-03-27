@@ -8,18 +8,18 @@ namespace Fablab.Models.Domain
 	{
 		[Display(Name = "Active")]
 		[Description("Active")]
-		Active=1,
+		Active=0,
 
 		[Display(Name = "Inactive")]
 		[Description("Inactive")]
-		Inactive=2,
+		Inactive=1,
 
 		[Display(Name = "Nonfunctional")]
 		[Description("Nonfunctional")]
-		Nonfunctional=3,
+		Nonfunctional=2,
 
 		[Display(Name = "Maintenance")]
 		[Description("Maintenance")]
-		Maintenance=4
+		Maintenance=3
 	}
 }

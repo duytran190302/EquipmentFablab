@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Fablab")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eec4e700b65057a97eb9552d0eeafc59898a2b36")]
 [assembly: System.Reflection.AssemblyProductAttribute("Fablab")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Fablab")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

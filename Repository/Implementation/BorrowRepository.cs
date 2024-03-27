@@ -61,6 +61,7 @@ namespace Fablab.Repository.Implementation
 
 		public async Task<Borrow> PostBorrowAsync(PostBorrowDTO entity)
 		{
+			// Thêm bước kiểm tra điều kiện thiết bị có thuọc dự án không: 
 
 
 			foreach (var EquipBorrow in entity.Equipment)
@@ -72,10 +73,22 @@ namespace Fablab.Repository.Implementation
 					{
 						entity.Equipment.Remove(EquipBorrow);
 					}
-					
 				}
 			}
-			var equipment = _db.Equipment.Where(x => entity.Equipment.Contains(x.EquipmentId)).ToList();
+
+			var project_temp = _db.Project.Where(x=>x.ProjectName==entity.ProjectName).FirstOrDefault();
+			List<string> strings = new List<string>();
+			foreach (var a  in project_temp.Equipments)
+			{
+				strings.Add(a.EquipmentName);
+			}
+
+			entity.Equipment = entity.Equipment.Intersect(strings).ToList();
+
+
+			var equipment = _db.Equipment.Where(x => entity.Equipment.Contains(x.EquipmentId)).ToList();// lấy tất cả thiết bị ở equipment postDTOcó id theo list 
+			// Kiểm tra có thuộc dự án không, duyệt 2 vòng lặp hoặc thêm trường khóa phụ cho Project
+
 			var borrow = new Borrow()
 			{
 				BorrowId = entity.BorrowId,
@@ -110,6 +123,12 @@ namespace Fablab.Repository.Implementation
 			var query = await _db.Borrow.Include(x => x.Project).Include(x=>x.Equipments).ToListAsync();
 
 			return query;
+		}
+
+		public async Task<List<Equipment>> SearchEquipmentForBorrowAsync(string projectName)
+		{
+			var equipment =  _db.Project.Where(x=>x.ProjectName==projectName).FirstOrDefault();
+			return equipment.Equipments.ToList();
 		}
 
 		public async Task<Borrow> UpdateAsync(Borrow entity)

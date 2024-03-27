@@ -93,3 +93,13 @@ C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.Newt
 C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Microsoft.AspNetCore.Razor.Language.dll
 C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Newtonsoft.Json.dll
 C:\Users\ACER\source\repos\Fablab\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.csproj.AssemblyReference.cache
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.AssemblyInfoInputs.cache
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.AssemblyInfo.cs
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.csproj.CoreCompileInputs.cache
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.dll
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\refint\Fablab.dll
+C:\Users\ACER\Documents\HK7\Fablab\obj\Debug\net6.0\Fablab.pdb

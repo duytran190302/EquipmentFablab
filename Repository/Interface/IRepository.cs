@@ -8,6 +8,7 @@ namespace Fablab.Repository.Interface
 			int pageSize = 0, int pageNumber = 1);
 		Task<T> GetAsync(Expression<Func<T, bool>> filter = null, bool tracked = true);
 		Task CreateAsync(T entity);
+		Task CreateNotracking(T entity);
 		Task RemoveAsync(T entity);
 		Task SaveAsync();
 	}

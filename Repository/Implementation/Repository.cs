@@ -75,5 +75,14 @@ namespace Fablab.Repository.Implementation
 			await _db.SaveChangesAsync();
 		}
 
+		public async Task CreateNotracking(T entity)
+		{
+
+			await dbSet.AddAsync(entity);
+
+			await SaveAsync();
+			//var entry = _db.Entry(entity);
+			//entry.State = EntityState.Detached;
+		}
 	}
 }
